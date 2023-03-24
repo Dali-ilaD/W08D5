@@ -64,9 +64,12 @@ Board.prototype.getPiece = function (pos) {
  * matches a given color.
  */
 Board.prototype.isMine = function (pos, color) {
-  if(this.getPiece(pos).color === color ){
+
+  if(this.getPiece(pos) === undefined) {
+    return false;
+  }else if(this.getPiece(pos).color === color) {
     return true;
-  }else{
+  } else {
     return false;
   }
 };
@@ -75,6 +78,11 @@ Board.prototype.isMine = function (pos, color) {
  * Checks if a given position has a piece on it.
  */
 Board.prototype.isOccupied = function (pos) {
+  if (!(this.getPiece(pos) === undefined)) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 /**
@@ -91,6 +99,29 @@ Board.prototype.isOccupied = function (pos) {
  * Returns empty array if no pieces of the opposite color are found.
  */
 Board.prototype._positionsToFlip = function(pos, color, dir, piecesToFlip){
+  let newPosition = [pos[0]+dir[0], pos[1]+dir[1]]
+
+  if (!piecesToFlip) {
+    piecesToFlip = [];
+  } else {
+    piecesToFlip.push(pos);
+  }
+
+  // (!this.isMine(newPosition, color))
+  // this line is handling when it goes off the board
+  if (!(this.isValidPos(newPosition))) {
+    return [];
+  // when you hit on empty position
+  } else if(!this.isOccupied(newPosition)) {
+    return [];
+  }
+  else if(this.isMine(newPosition, color)) {
+    return piecesToFlip;
+  } else {
+    return this._positionsToFlip(newPosition, color, dir, piecesToFlip);
+  }
+
+  // from original pos, move in one dir, check if it's correct, recursively call the same function with another provided dir and keep adding the piecestoFlip until the last dir results in end of the board ([8,8])
 };
 
 /**
